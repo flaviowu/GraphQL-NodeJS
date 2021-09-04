@@ -1,46 +1,29 @@
 import { createServer } from 'http';
 import { parse } from 'querystring'
 
-const server = createServer((request, response) => {
-    switch (request.url) {
-        case '/status': {
-            response.writeHead(200, {
-                'Content-Type': 'application/json',
-            });
-            response.write(JSON.stringify({
-                    status: 'Okay'
-                })
-            );
-            response.end();
-            break;
-        }
+import express from 'express';
+
+const server = express()
+server.get('/status', ( _, response) => {
+    response.send({
+        status: 'Okay'
+    })
+})
+
+server.post('/authenticate', express.json(), (request, response) => {
+    console.log({
+        'E-mail': request.body.email,
+        'Senha': request.body.password
+    })
+    response.send('E-mail e senha recebidos')
+})
 
 
-        case '/authenticate': {
-            let data = '';
-            request.on('data', (chunk) => {
-                data += chunk;
-            });
-            request.on('end', () => {
-                const params = parse(data);
-                response.end();
-            })
-            break;
-        }
-
- 
-
-        default: {
-            response.writeHead(404);
-            response.end();
-        }
-    }
-});
 
 const PORT = process.env.PORT ? parseInt(process.env.PORT) : 8000;
 const HOSTNAME = process.env.HOSTNAME || '127.0.0.1'
 
 server.listen(8000, '127.0.0.1', () => {
     console.log(`Server is listening at http://${HOSTNAME}:${PORT}`);
-});
+})
 
